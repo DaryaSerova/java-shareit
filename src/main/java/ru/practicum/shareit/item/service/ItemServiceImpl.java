@@ -55,7 +55,7 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemNotFoundException("Предмет не найден.");
         }
 
-        if (itemInDb.get().getOwnerId() != ownerId) {
+        if (itemInDb.get().getOwnerId().equals(ownerId)) {
             throw new UserNotOwnerItemException("Пользователь не является владельцем предмета.");
         }
 
