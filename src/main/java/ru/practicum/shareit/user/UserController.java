@@ -24,9 +24,9 @@ public class UserController {
         return userService.createUser(user);
     }
 
-    @RequestMapping(value ="/{userId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
     public UserDto updateUser(@RequestBody UserDto user,
-                              @PathVariable("userId") Long id){
+                              @PathVariable("userId") Long id) {
         log.info("запрос на обновление пользователя:" + user + "с id " + id);
         return userService.updateUser(user, id);
     }
@@ -45,7 +45,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void  deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable Long id) {
         log.info("запрос на удаление пользователя:" + id);
         userService.deleteUser(id);
     }

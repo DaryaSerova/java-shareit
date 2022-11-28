@@ -24,10 +24,10 @@ public class UserMapper {
     }
 
     public User toUser(UserDto userDto, User user) {
-         if(userDto.getEmail() != null && !userDto.getEmail().isEmpty()){
-             user.setEmail(userDto.getEmail());
-         }
-        if(userDto.getName() != null && !userDto.getName().isEmpty()){
+        if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
+            user.setEmail(userDto.getEmail());
+        }
+        if (userDto.getName() != null && !userDto.getName().isEmpty()) {
             user.setName(userDto.getName());
         }
         return user;
