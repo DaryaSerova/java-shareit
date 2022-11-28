@@ -54,8 +54,8 @@ public class ItemServiceImpl implements ItemService {
         if (itemInDb.isEmpty()) {
             throw new ItemNotFoundException("Предмет не найден.");
         }
-
-        if (!itemInDb.get().getOwnerId().equals(ownerId)) {
+        var ownerIdDb = itemInDb.get().getOwnerId();
+        if (!ownerIdDb.equals(ownerId)) {
             throw new UserNotOwnerItemException("Пользователь не является владельцем предмета.");
         }
 
