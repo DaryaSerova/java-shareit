@@ -50,7 +50,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemOwnerDto> getAvailableItemsByName(@RequestHeader(OWNER_ID) Long ownerId,
-                                                 @RequestParam String text) {
+                                                      @RequestParam String text) {
         log.info("запрос на получение всех доступных предметов с именем: " + text);
         return itemService.getAvailableItemsByName(text);
 
