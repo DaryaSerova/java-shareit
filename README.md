@@ -23,16 +23,3 @@
     * request_id - ссылка на пользователя по запросу, которого вещь была добавлена.
 
 ![](https://github.com/DaryaSerova/java-shareit/blob/add-controllers/Entity-relationship%20diagram_ShareIt.png)
-**Схема базы данных**
-
-* user_t - данные о пользователях (primary key - id)
-  * name - имя пользователя
-  * email - электронный адрес пользователя
-* item_t - данные о вещах передаваемых в аренду (primary key - id, foreign key - owner_id)
-  * owner_id - ссылка на пользователя, который добавил предмет
-  * name - название вещи
-  * description - описание вещи
-  * available - статус о том, доступна или нет вещь для аренды
-  * request_id - ссылка на пользователя по запросу, которого вещь была добавлена.
-  
-![](https://github.com/DaryaSerova/java-shareit/blob/add-controllers/Entity-relationship%20diagram_ShareIt.png)
