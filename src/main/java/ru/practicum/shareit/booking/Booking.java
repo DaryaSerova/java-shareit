@@ -22,16 +22,16 @@ public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    LocalDateTime start;
+    private LocalDateTime start;
 
-    LocalDateTime end;
+    private LocalDateTime end;
 
-    Long itemId;
+    private Long itemId;
 
-    Long bookerId;
+    private Long bookerId;
 
-    BookingStatus status;
+    private BookingStatus status;
 
 }

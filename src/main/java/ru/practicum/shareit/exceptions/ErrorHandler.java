@@ -13,9 +13,9 @@ import javax.validation.ValidationException;
 public class ErrorHandler {
 
     @ExceptionHandler({UserNotFoundException.class, ItemEmptyAvailableException.class,
-            ItemEmptyDescriptionException.class, ItemEmptyNameException.class, ItemNotFoundException.class,
-            UserDuplicateEmailException.class, UserEmptyEmailException.class, UserInvalidEmailException.class,
-            UserNotFoundException.class, UserNotOwnerItemException.class})
+    ItemEmptyDescriptionException.class, ItemEmptyNameException.class, ItemNotFoundException.class,
+    UserDuplicateEmailException.class, UserEmptyEmailException.class, UserInvalidEmailException.class,
+    UserNotFoundException.class, UserNotOwnerItemException.class})
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final RuntimeException e) {

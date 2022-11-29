@@ -23,9 +23,9 @@ public class ItemRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @NotBlank
-    String description;
-    Long requestorId;
-    LocalDateTime created;
+    private String description;
+    private Long requestorId;
+    private LocalDateTime created;
 }
