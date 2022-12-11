@@ -2,14 +2,26 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.*;
+import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.booking.service.BookingPersistService;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.comment.exception.CommentBadRequestException;
+import ru.practicum.shareit.item.comment.mapper.CommentMapper;
+import ru.practicum.shareit.item.comment.repository.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
+import ru.practicum.shareit.item.exceptions.ItemEmptyAvailableException;
+import ru.practicum.shareit.item.exceptions.ItemEmptyNameException;
+import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.jpa.ItemPersistService;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.jpa.UserPersistService;
+import ru.practicum.shareit.user.exceptions.UserNotFoundException;
+import ru.practicum.shareit.user.exceptions.UserNotOwnerItemException;
+import ru.practicum.shareit.user.service.UserPersistService;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,6 +35,9 @@ public class ItemServiceImpl implements ItemService {
     private final ItemPersistService itemPersistService;
     private final UserPersistService userPersistService;
     private final ItemMapper itemMapper;
+    private final CommentMapper commentMapper;
+    private final CommentRepository commentRepository;
+    private final BookingPersistService bookingPersistService;
 
     @Override
     public ItemDto addItem(Long ownerId, ItemDto itemDto) {
@@ -68,17 +83,21 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItemById(Long id) {
+    public ItemDto getItemById(Long ownerId, Long id) {
 
         Optional<Item> item = itemPersistService.findItemById(id);
 
         if (item.isEmpty()) {
             throw new ItemNotFoundException("Предмет не найден.");
         }
-
-        ItemDto itemResult = itemMapper.toItemDto(item.get());
+        var bookings = bookingPersistService.findBookingByItemId(id)
+                .stream()
+                .filter(el -> el.getItem().getOwnerId().equals(ownerId))
+                .collect(Collectors.toList());
+        ItemDto itemResult = itemMapper.toItemDto(item.get(), bookings);
         return itemResult;
     }
+
 
     @Override
     public List<ItemOwnerDto> getAllItemsByOwnerId(Long ownerId) {
@@ -90,7 +109,9 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return items.stream()
-                .map(itemMapper::toItemOwnerDto)
+                .map(el -> itemMapper.toItemOwnerDto(el,
+                        bookingPersistService.findBookingByItemId(el.getId())))
+                .sorted(Comparator.comparing(ItemOwnerDto::getId))
                 .collect(Collectors.toList());
     }
 
@@ -107,7 +128,30 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return items.stream()
-                .map(itemMapper::toItemOwnerDto)
+                .map(el -> itemMapper.toItemOwnerDto(el,
+                        bookingPersistService.findBookingByItemId(el.getId())))
+                .sorted(Comparator.comparing(ItemOwnerDto::getId))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CommentDto addItemComment(Long ownerId, Long itemId, CommentDto commentDto) {
+        if (itemId == null || commentDto.getText() == null || commentDto.getText().isEmpty()) {
+            throw new CommentBadRequestException("Не валидные параметры комментария ");
+        }
+        getItemById(ownerId, itemId);
+        commentDto.setItemId(itemId);
+        commentDto.setAuthorId(ownerId);
+        var bookings = bookingPersistService.findBookingByItemIdAndStatusNotInAndStartBefore(itemId,
+                List.of(BookingStatus.REJECTED), LocalDateTime.now());
+        if (bookings == null || bookings.isEmpty()) {
+            throw new CommentBadRequestException("Требуется бронирование для создания комментария ");
+        }
+
+        var result = commentMapper.toDto(commentRepository.save(commentMapper.toModel(commentDto)));
+        var author = userPersistService.findUserById(ownerId).get();
+        result.setAuthorName(author.getName());
+        return result;
+
     }
 }

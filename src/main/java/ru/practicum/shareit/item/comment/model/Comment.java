@@ -1,31 +1,37 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.item.comment.model;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-item-requests.
- */
-
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemRequest {
-
+@Builder
+@Entity
+@Table(name = "COMMENT_T")
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotBlank
-    private String description;
-    private Long requestorId;
+    private String text;
+
+    @Column(name = "item_id")
+    private Long itemId;
+
+    private Long authorId;
+
     private LocalDateTime created;
+
+    @PrePersist
+    public void prePersist() {
+        created = LocalDateTime.now();
+    }
 }

@@ -1,12 +1,13 @@
-package ru.practicum.shareit.exceptions;
+package ru.practicum.shareit.booking.exceptions;
+
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-public class ItemEmptyAvailableException extends RuntimeException {
+public class BookingStateBadRequestException extends RuntimeException {
 
-    public ItemEmptyAvailableException(final String message) {
+    public BookingStateBadRequestException(final String message) {
         super(message);
     }
 

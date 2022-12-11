@@ -1,8 +1,8 @@
-package ru.practicum.shareit.user.jpa;
+package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
@@ -18,7 +18,6 @@ public class UserPersistServiceImpl implements UserPersistService {
     @Override
     public User createUser(User user) {
         return repository.save(user);
-
     }
 
     @Override
