@@ -43,4 +43,4 @@
   * author_id - автор комментария,
   * created - дата создания комментария.
 
-![](https://github.com/DaryaSerova/java-shareit/blob/add-controllers/Entity-relationship%20diagram_ShareIt.png)
+![](https://github.com/DaryaSerova/java-shareit/blob/add-bookings/db_shareit.png)
