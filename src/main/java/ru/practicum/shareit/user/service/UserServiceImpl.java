@@ -2,13 +2,12 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.UserDuplicateEmailException;
-import ru.practicum.shareit.exceptions.UserEmptyEmailException;
-import ru.practicum.shareit.exceptions.UserInvalidEmailException;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.exceptions.UserDuplicateEmailException;
+import ru.practicum.shareit.user.exceptions.UserEmptyEmailException;
+import ru.practicum.shareit.user.exceptions.UserInvalidEmailException;
+import ru.practicum.shareit.user.exceptions.UserNotFoundException;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.jpa.UserPersistService;
 import ru.practicum.shareit.user.mapper.UserMapper;
 
 import java.util.List;
@@ -37,11 +36,6 @@ public class UserServiceImpl implements UserService {
             throw new UserInvalidEmailException("Email не может быть пустым.");
         }
 
-        Optional<User> duplicateUser = userPersistService.findUserByEmail(user.getEmail());
-        if (duplicateUser.isPresent()) {
-            throw new UserDuplicateEmailException(String.format("Пользователь с email %s уже существует."));
-        }
-
         UserDto userResult = userMapper.toUserDto(userPersistService.createUser(userMapper.toUser(user)));
         return userResult;
     }
@@ -53,6 +47,10 @@ public class UserServiceImpl implements UserService {
 
         if (userInDb.isEmpty()) {
             throw new UserNotFoundException("Пользователь не найден.");
+        }
+        Optional<User> duplicateUser = userPersistService.findUserByEmail(userDto.getEmail());
+        if (duplicateUser.isPresent() && !duplicateUser.get().getId().equals(userDto.getId())) {
+            throw new UserDuplicateEmailException(String.format("Пользователь с email %s уже существует."));
         }
         userDto.setId(id);
         UserDto userResult = userMapper.toUserDto(userPersistService
