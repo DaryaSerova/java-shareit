@@ -31,7 +31,7 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public BookingDto getBooking(Long ownerId, Long bookingId) {
+    public BookingDto findBookingById(Long ownerId, Long bookingId) {
         var booking = getBooking(bookingId);
         userService.getUser(ownerId);
 
