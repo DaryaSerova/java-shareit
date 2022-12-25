@@ -23,7 +23,6 @@ import ru.practicum.shareit.user.exceptions.UserNotOwnerItemException;
 import ru.practicum.shareit.user.service.UserPersistService;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -116,8 +115,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public Page<ItemOwnerDto> getAllItemsByOwnerId(Long ownerId, Integer from,
-                                                   Integer size) {
+    public Page<ItemOwnerDto> getAllItemsByOwnerId(Long ownerId, Integer from, Integer size) {
 
         Page<Item> items = itemPersistService.findAllItemsByOwnerId(ownerId, from, size);
 
@@ -131,8 +129,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Page<ItemOwnerDto> getAvailableItemsByName(String name, Integer from,
-                                                      Integer size) {
+    public Page<ItemOwnerDto> getAvailableItemsByName(String name, Integer from, Integer size) {
 
         if (name == null || name.isEmpty()) {
             return Page.empty();
@@ -144,8 +141,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return items
-                .map(el -> itemMapper.toItemOwnerDto(el,
-                        bookingPersistService.findBookingByItemId(el.getId())));
+                .map(el -> itemMapper.toItemOwnerDto(el, bookingPersistService.findBookingByItemId(el.getId())));
     }
 
     @Override
