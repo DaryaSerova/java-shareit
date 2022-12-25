@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.jpa;
 
+import org.springframework.data.domain.Page;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
@@ -13,9 +14,10 @@ public interface ItemPersistService {
 
     Optional<Item> findItemById(Long id);
 
-    List<Item> findAllItemsByOwnerId(Long ownerId);
+    Page<Item> findAllItemsByOwnerId(Long ownerId, Integer from, Integer size);
 
-    List<Item> findAvailableItemsByName(String name);
+    Page<Item> findAvailableItemsByName(String name, Integer from, Integer size);
 
+    List<Item> findItemsByRequestId(Long requestId);
 
 }

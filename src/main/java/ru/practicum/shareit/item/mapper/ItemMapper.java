@@ -1,12 +1,12 @@
 package ru.practicum.shareit.item.mapper;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.mapper.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
+import ru.practicum.shareit.item.dto.ItemToRequestDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.service.UserPersistService;
 
@@ -14,23 +14,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
-@RequiredArgsConstructor
-public class ItemMapper {
+@Mapper(componentModel = "spring",
+        builder = @Builder(disableBuilder = true), uses = {CommentMapper.class, UserPersistService.class},
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface ItemMapper {
 
-    private final CommentMapper commentMapper;
-    private final UserPersistService userPersistService;
 
-    public ItemDto toItemDto(Item item) {
+    ItemDto toItemDto(Item item);
 
-        var itemDto = ItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .ownerId(item.getOwnerId())
-                .available(item.getAvailable())
-                .requestId(item.getRequestId())
-                .build();
+    @AfterMapping
+    default void afterMappingItemDto(Item item,
+                                     @MappingTarget ItemDto itemDto,
+                                     @Context CommentMapper commentMapper) {
+
         if (item.getComments() != null && !item.getComments().isEmpty()) {
             var comments = item.getComments().stream()
                     .map(commentMapper::toDto)
@@ -39,19 +35,17 @@ public class ItemMapper {
         } else {
             itemDto.setComments(new ArrayList<>());
         }
-        return itemDto;
     }
 
-    public ItemDto toItemDto(Item item, List<Booking> bookings) {
+    ItemDto toItemDto(Item item, List<Booking> bookings,
+                      @Context CommentMapper commentMapper,
+                      @Context UserPersistService userPersistService);
 
-        var itemDto = ItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .ownerId(item.getOwnerId())
-                .available(item.getAvailable())
-                .requestId(item.getRequestId())
-                .build();
+    @AfterMapping
+    default void afterMappingItemDto(Item item,
+                                     @MappingTarget ItemDto itemDto,
+                                     @Context CommentMapper commentMapper,
+                                     @Context UserPersistService userPersistService) {
         if (item.getComments() != null && !item.getComments().isEmpty()) {
             var comments = item.getComments().stream()
                     .map(commentMapper::toDto)
@@ -63,38 +57,26 @@ public class ItemMapper {
         } else {
             itemDto.setComments(new ArrayList<>());
         }
+    }
+
+    @AfterMapping
+    default void afterMappingItemOwnerDto(List<Booking> bookings,
+                                          @MappingTarget ItemDto itemDto) {
         if (bookings != null && !bookings.isEmpty()) {
             itemDto.setLastBooking(toDto(bookings.get(0)));
             if (bookings.size() > 1) {
                 itemDto.setNextBooking(toDto(bookings.get(1)));
             }
         }
-        return itemDto;
     }
 
-    public Item toItem(ItemDto itemDto, Long ownerId) {
-        var item = Item.builder()
-                .id(itemDto.getId())
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .ownerId(ownerId)
-                .available(itemDto.getAvailable())
-                .requestId(itemDto.getRequestId())
-                .build();
+    @Mapping(target = "ownerId", source = "ownerId")
+    Item toItem(ItemDto itemDto, Long ownerId);
 
-        if (itemDto.getComments() != null && !itemDto.getComments().isEmpty()) {
-            var comments = itemDto.getComments().stream()
-                    .map(commentMapper::toModel)
-                    .collect(Collectors.toList());
-            item.setComments(comments);
-        } else {
-            itemDto.setComments(new ArrayList<>());
-        }
+    void mergeToItem(ItemDto itemDto, @MappingTarget Item item);
 
-        return item;
-    }
-
-    public Item toItem(ItemDto itemDto, Item item) {
+    @AfterMapping
+    default void afterMergeToItem(ItemDto itemDto, @MappingTarget Item item) {
         if (itemDto.getName() != null && !itemDto.getName().isEmpty()) {
             item.setName(itemDto.getName());
         }
@@ -106,35 +88,26 @@ public class ItemMapper {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
-        return item;
     }
 
-    public ItemOwnerDto toItemOwnerDto(Item item, List<Booking> bookings) {
+    ItemOwnerDto toItemOwnerDto(Item item, List<Booking> bookings);
 
-        var itemDto = ItemOwnerDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .build();
+    @AfterMapping
+    default void afterMappingItemOwnerDto(List<Booking> bookings,
+                                          @MappingTarget ItemOwnerDto itemOwnerDto) {
         if (bookings != null && !bookings.isEmpty()) {
-            itemDto.setLastBooking(toDto(bookings.get(0)));
+            itemOwnerDto.setLastBooking(toDto(bookings.get(0)));
             if (bookings.size() > 1) {
-                itemDto.setNextBooking(toDto(bookings.get(1)));
+                itemOwnerDto.setNextBooking(toDto(bookings.get(1)));
             }
         }
-        return itemDto;
     }
 
+    @Mapping(target = "bookerId", source = "entity.booker.id")
+    @Mapping(target = "itemId", source = "entity.item.id")
+    BookingCreateDto toDto(Booking entity);
 
-    public BookingCreateDto toDto(Booking entity) {
+    @Mapping(target = "available", source = "item.available")
+    ItemToRequestDto itemToItemToRequestDto(Item item);
 
-        return BookingCreateDto.builder()
-                .id(entity.getId())
-                .start(entity.getStart())
-                .end(entity.getEnd())
-                .status(entity.getStatus())
-                .bookerId(entity.getBooker().getId())
-                .build();
-    }
 }

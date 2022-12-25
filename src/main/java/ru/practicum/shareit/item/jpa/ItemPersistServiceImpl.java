@@ -1,6 +1,9 @@
 package ru.practicum.shareit.item.jpa;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -32,13 +35,18 @@ public class ItemPersistServiceImpl implements ItemPersistService {
     }
 
     @Override
-    public List<Item> findAllItemsByOwnerId(Long ownerId) {
-        return itemRepository.findByOwnerId(ownerId);
+    public Page<Item> findAllItemsByOwnerId(Long ownerId, Integer from, Integer size) {
+        return itemRepository.findByOwnerId(ownerId, PageRequest.of(from, size, Sort.by("id")));
     }
 
     @Override
-    public List<Item> findAvailableItemsByName(String name) {
-        return itemRepository.findByNameOrDescription(name);
+    public Page<Item> findAvailableItemsByName(String name, Integer from, Integer size) {
+        return itemRepository.findByNameOrDescription(name, PageRequest.of(from, size, Sort.by("id")));
+    }
+
+    @Override
+    public List<Item> findItemsByRequestId(Long requestId) {
+        return itemRepository.findByRequestId(requestId);
     }
 
 }

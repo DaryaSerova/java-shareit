@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.dto.BookingCreateDto;
 
 @Data
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class ItemOwnerDto {
+public class ItemToRequestDto {
 
     private Long id;
 
@@ -20,8 +19,8 @@ public class ItemOwnerDto {
 
     private Boolean available;
 
-    private BookingCreateDto lastBooking;
+    private Long ownerId;
 
-    private BookingCreateDto nextBooking;
+    private Long requestId;
 }
 

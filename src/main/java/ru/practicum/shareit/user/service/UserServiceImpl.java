@@ -6,9 +6,9 @@ import ru.practicum.shareit.user.exceptions.UserDuplicateEmailException;
 import ru.practicum.shareit.user.exceptions.UserEmptyEmailException;
 import ru.practicum.shareit.user.exceptions.UserInvalidEmailException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +20,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserPersistService userPersistService;
+
     private final UserMapper userMapper;
+
     private Pattern emailPattern = Pattern.compile("^.+@.+\\..+$");
 
     @Override
@@ -52,25 +54,36 @@ public class UserServiceImpl implements UserService {
         if (duplicateUser.isPresent() && !duplicateUser.get().getId().equals(userDto.getId())) {
             throw new UserDuplicateEmailException(String.format("Пользователь с email %s уже существует."));
         }
+
         userDto.setId(id);
-        UserDto userResult = userMapper.toUserDto(userPersistService
-                .updateUser(userMapper.toUser(userDto, userInDb.get())));
+
+        var userEntity = userInDb.get();
+
+        userMapper.merge(userDto, userEntity);
+
+        UserDto userResult = userMapper.toUserDto(userPersistService.updateUser(userEntity));
+
         return userResult;
     }
 
     @Override
     public UserDto getUser(Long id) {
         Optional<User> user = userPersistService.findUserById(id);
+
         if (user.isEmpty()) {
             throw new UserNotFoundException("Пользователь не найден.");
         }
+
         UserDto userResult = userMapper.toUserDto(user.get());
+
         return userResult;
     }
 
     @Override
     public List<UserDto> findAllUsers() {
+
         List<User> users = userPersistService.findAllUsers();
+
         return users.stream()
                 .map(userMapper::toUserDto)
                 .collect(Collectors.toList());

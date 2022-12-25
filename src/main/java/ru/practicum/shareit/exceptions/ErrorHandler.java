@@ -8,28 +8,26 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.booking.exceptions.*;
 import ru.practicum.shareit.item.comment.exception.CommentBadRequestException;
 import ru.practicum.shareit.item.exceptions.*;
+import ru.practicum.shareit.request.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.user.exceptions.*;
 
 @RestControllerAdvice("ru.practicum.shareit")
 @Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class,
-            UserNotFoundException.class, BookingNotFoundException.class,
-            UserNotOwnerItemException.class, BookingOwnerNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class, UserNotFoundException.class,
+    BookingNotFoundException.class, UserNotOwnerItemException.class, BookingOwnerNotFoundException.class,
+    RequestNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final RuntimeException e) {
         log.info(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({UserDuplicateEmailException.class,
-            UserEmptyEmailException.class, UserInvalidEmailException.class,
-            ItemEmptyAvailableException.class,
-            ItemEmptyDescriptionException.class, ItemEmptyNameException.class,
-            BookingStateBadRequestException.class,
-            BookingStatusBadRequestException.class, BookingDateBadRequestException.class,
-            ItemUnavailableException.class, CommentBadRequestException.class})
+    @ExceptionHandler({UserDuplicateEmailException.class, UserEmptyEmailException.class,
+    UserInvalidEmailException.class, ItemEmptyAvailableException.class, ItemEmptyDescriptionException.class,
+    ItemEmptyNameException.class, BookingStateBadRequestException.class, BookingStatusBadRequestException.class,
+    BookingDateBadRequestException.class, ItemUnavailableException.class, CommentBadRequestException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestFoundException(final RuntimeException e) {
         log.info(e.getMessage(), e);

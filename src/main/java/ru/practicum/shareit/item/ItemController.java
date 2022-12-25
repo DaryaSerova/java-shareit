@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 import static ru.practicum.shareit.auth.AuthConstant.OWNER_ID;
@@ -46,17 +47,20 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemOwnerDto> getAllItemsByOwnerId(@RequestHeader(OWNER_ID) Long ownerId) {
+    public List<ItemOwnerDto> getAllItemsByOwnerId(@RequestHeader(OWNER_ID) Long ownerId,
+                                                   @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                   @RequestParam(defaultValue = "20") @PositiveOrZero Integer size) {
         log.info("запрос на получение всех предметов пользователя с id: " + ownerId);
-        return itemService.getAllItemsByOwnerId(ownerId);
+        return itemService.getAllItemsByOwnerId(ownerId, from, size).getContent();
     }
-
 
     @GetMapping("/search")
     public List<ItemOwnerDto> getAvailableItemsByName(@RequestHeader(OWNER_ID) Long ownerId,
-                                                      @RequestParam String text) {
+                                                      @RequestParam String text,
+                                                      @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                      @RequestParam(defaultValue = "20") @PositiveOrZero Integer size) {
         log.info("запрос на получение всех доступных предметов с именем: " + text);
-        return itemService.getAvailableItemsByName(text);
+        return itemService.getAvailableItemsByName(text, from, size).getContent();
 
     }
 

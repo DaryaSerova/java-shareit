@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingPersistService;
@@ -10,6 +11,7 @@ import ru.practicum.shareit.item.comment.mapper.CommentMapper;
 import ru.practicum.shareit.item.comment.repository.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
+import ru.practicum.shareit.item.dto.ItemToRequestDto;
 import ru.practicum.shareit.item.exceptions.ItemEmptyAvailableException;
 import ru.practicum.shareit.item.exceptions.ItemEmptyNameException;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
@@ -75,8 +77,11 @@ public class ItemServiceImpl implements ItemService {
         }
 
         itemDto.setId(id);
+        var entity = itemInDb.get();
+        itemMapper.mergeToItem(itemDto, entity);
+        entity.setOwnerId(ownerId);
         ItemDto itemResult = itemMapper.toItemDto(itemPersistService
-                .updateItem(itemMapper.toItem(itemDto, itemInDb.get())));
+                .updateItem(entity));
 
         return itemResult;
 
@@ -94,44 +99,53 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .filter(el -> el.getItem().getOwnerId().equals(ownerId))
                 .collect(Collectors.toList());
-        ItemDto itemResult = itemMapper.toItemDto(item.get(), bookings);
+        ItemDto itemResult = itemMapper.toItemDto(item.get(), bookings, commentMapper, userPersistService);
         return itemResult;
     }
 
-
     @Override
-    public List<ItemOwnerDto> getAllItemsByOwnerId(Long ownerId) {
-
-        List<Item> items = itemPersistService.findAllItemsByOwnerId(ownerId);
-
-        if (items.isEmpty()) {
-            throw new ItemNotFoundException("Предмет не найден.");
+    public List<ItemToRequestDto> getItemsByRequestId(Long requestId) {
+        var items = itemPersistService.findItemsByRequestId(requestId);
+        if (items == null || items.isEmpty()) {
+            return emptyList();
         }
-
         return items.stream()
-                .map(el -> itemMapper.toItemOwnerDto(el,
-                        bookingPersistService.findBookingByItemId(el.getId())))
-                .sorted(Comparator.comparing(ItemOwnerDto::getId))
+                .map(itemMapper::itemToItemToRequestDto)
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<ItemOwnerDto> getAvailableItemsByName(String name) {
 
-        if (name == null || name.isEmpty()) {
-            return emptyList();
-        }
-        List<Item> items = itemPersistService.findAvailableItemsByName(name);
+    @Override
+    public Page<ItemOwnerDto> getAllItemsByOwnerId(Long ownerId, Integer from,
+                                                   Integer size) {
+
+        Page<Item> items = itemPersistService.findAllItemsByOwnerId(ownerId, from, size);
 
         if (items.isEmpty()) {
             throw new ItemNotFoundException("Предмет не найден.");
         }
 
-        return items.stream()
+        return items
                 .map(el -> itemMapper.toItemOwnerDto(el,
-                        bookingPersistService.findBookingByItemId(el.getId())))
-                .sorted(Comparator.comparing(ItemOwnerDto::getId))
-                .collect(Collectors.toList());
+                        bookingPersistService.findBookingByItemId(el.getId())));
+    }
+
+    @Override
+    public Page<ItemOwnerDto> getAvailableItemsByName(String name, Integer from,
+                                                      Integer size) {
+
+        if (name == null || name.isEmpty()) {
+            return Page.empty();
+        }
+        var items = itemPersistService.findAvailableItemsByName(name, from, size);
+
+        if (items.isEmpty()) {
+            throw new ItemNotFoundException("Предмет не найден.");
+        }
+
+        return items
+                .map(el -> itemMapper.toItemOwnerDto(el,
+                        bookingPersistService.findBookingByItemId(el.getId())));
     }
 
     @Override

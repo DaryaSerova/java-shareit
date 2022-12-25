@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -46,8 +47,8 @@ public class BookingPersistServiceImpl implements BookingPersistService {
     }
 
     @Override
-    public List<Booking> findBookingForUserByState(Long ownerId, BookingState state) {
-        var page = PageRequest.of(0, 1000, Sort.by("start").descending());
+    public Page<Booking> findBookingForUserByState(Long ownerId, BookingState state, Integer from, Integer size) {
+        var page = PageRequest.of(from / size, size, Sort.by("start").descending());
         switch (state) {
             case CURRENT:
                 return bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(
@@ -67,8 +68,9 @@ public class BookingPersistServiceImpl implements BookingPersistService {
     }
 
     @Override
-    public List<Booking> findBookingForUserByItems(Long ownerId, List<Long> itemIds, BookingState state) {
-        var page = PageRequest.of(0, 1000, Sort.by("start").descending());
+    public Page<Booking> findBookingForUserByItems(Long ownerId, List<Long> itemIds, BookingState state,
+                                                   Integer from, Integer size) {
+        var page = PageRequest.of(from, size, Sort.by("start").descending());
         switch (state) {
             case CURRENT:
                 return bookingRepository.findByStartBeforeAndEndAfterAndItemIdIn(

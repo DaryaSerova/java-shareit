@@ -1,30 +1,25 @@
-package ru.practicum.shareit.item.comment.dto;
-
+package ru.practicum.shareit.request.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.item.dto.ItemToRequestDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class CommentDto {
+public class RequestRequestorDto {
 
     private Long id;
 
-    private String text;
-
-    private Long itemId;
-
-    private Long authorId;
-
-    private String authorName;
+    private String description;
 
     private LocalDateTime created;
 
-
+    private List<ItemToRequestDto> items;
 }

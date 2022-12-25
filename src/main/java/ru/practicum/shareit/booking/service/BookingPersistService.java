@@ -1,10 +1,9 @@
 package ru.practicum.shareit.booking.service;
 
+import org.springframework.data.domain.Page;
 import ru.practicum.shareit.booking.BookingState;
-
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
-
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +22,9 @@ public interface BookingPersistService {
     List<Booking> findBookingByItemIdAndStatusNotInAndStartBefore(
             Long itemId, List<BookingStatus> statuses, LocalDateTime start);
 
-    List<Booking> findBookingForUserByState(Long ownerId, BookingState state);
+    Page<Booking> findBookingForUserByState(Long ownerId, BookingState state, Integer from,
+                                            Integer size);
 
-    List<Booking> findBookingForUserByItems(Long ownerId, List<Long> itemIds, BookingState state);
+    Page<Booking> findBookingForUserByItems(Long ownerId, List<Long> itemIds, BookingState state,
+             Integer from, Integer size);
 }

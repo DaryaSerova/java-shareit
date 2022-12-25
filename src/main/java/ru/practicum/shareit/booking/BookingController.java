@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.exceptions.BookingStateBadRequestException;
 import ru.practicum.shareit.booking.service.BookingService;
 
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 import static ru.practicum.shareit.auth.AuthConstant.OWNER_ID;
@@ -34,8 +35,7 @@ public class BookingController {
     public BookingDto approveBooking(@RequestHeader(OWNER_ID) Long ownerId,
                                      @PathVariable("bookingId") Long bookingId,
                                      @RequestParam("approved") Boolean isApproved) {
-        log.info("Подтверждение или отклонение запроса на бронирование:" + bookingId + "с признаком "
-                + isApproved);
+        log.info("Подтверждение или отклонение запроса на бронирование:" + bookingId + "с признаком " + isApproved);
         return bookingService.approveBooking(ownerId, bookingId, isApproved);
     }
 
@@ -46,10 +46,12 @@ public class BookingController {
         return bookingService.findBookingById(ownerId, bookingId);
     }
 
-    @GetMapping()
+    @GetMapping
     public List<BookingDto> getBookingForUserByState(
             @RequestHeader(OWNER_ID) Long ownerId,
-            @RequestParam(value = "state", required = false, defaultValue = "ALL") String state) {
+            @RequestParam(value = "state", required = false, defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "20") @PositiveOrZero Integer size) {
 
         BookingState bookingState;
         try {
@@ -58,13 +60,15 @@ public class BookingController {
             throw new BookingStateBadRequestException(String.format("Unknown state: %s", state));
         }
         log.info("запрос на получение бронирования пользователя:" + ownerId);
-        return bookingService.getBookingForUserByState(ownerId, bookingState);
+        return bookingService.getBookingForUserByState(ownerId, bookingState, from, size).getContent();
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getBookingForUserByItems(
             @RequestHeader(OWNER_ID) Long ownerId,
-            @RequestParam(value = "state", required = false, defaultValue = "ALL") String state) {
+            @RequestParam(value = "state", required = false, defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "20") @PositiveOrZero Integer size) {
 
         BookingState bookingState;
         try {
@@ -73,6 +77,6 @@ public class BookingController {
             throw new BookingStateBadRequestException(String.format("Unknown state: %s", state));
         }
         log.info("запрос на получение бронирования пользователя:" + ownerId);
-        return bookingService.getBookingForUserByItems(ownerId, bookingState);
+        return bookingService.getBookingForUserByItems(ownerId, bookingState, from, size).getContent();
     }
 }

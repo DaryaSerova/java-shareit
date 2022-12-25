@@ -21,20 +21,24 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotBlank(message = "Введите название предмета.")
     private String name;
+
     @NotBlank(message = "Введите описание предмета.")
     private String description;
+
     private Long ownerId;
+
     private Boolean available;
+
     private Long requestId;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id")
     private List<Comment> comments;
 
-    public Item(Long id, String name, String description,
-                Long ownerId, Boolean available) {
+    public Item(Long id, String name, String description, Long ownerId, Boolean available) {
         this.id = id;
         this.name = name;
         this.description = description;

@@ -1,8 +1,6 @@
 package ru.practicum.shareit.booking.mapper;
 
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -11,46 +9,54 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 
-@Component
-@RequiredArgsConstructor
-public class BookingMapper {
 
-    private final UserMapper userMapper;
-    private final ItemMapper itemMapper;
+@Mapper(componentModel = "spring",
+        builder = @Builder(disableBuilder = true), uses = {UserMapper.class, ItemMapper.class},
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface BookingMapper {
 
-    public Booking toModel(BookingDto dto) {
+    @Mapping(target = "booker", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    Booking toModel(BookingDto dto);
 
-        return Booking.builder()
-                .id(dto.getId())
-                .booker(userMapper.toUser(dto.getBooker()))
-                .start(dto.getStart())
-                .end(dto.getEnd())
-                .status(dto.getStatus())
-                .item(itemMapper.toItem(dto.getItem(), dto.getItem().getOwnerId()))
-                .build();
+    @AfterMapping
+    default void afterMappingBooking(BookingDto dto,
+                                     @MappingTarget Booking booking,
+                                     @Context UserMapper userMapper,
+                                     @Context ItemMapper itemMapper) {
+        booking.setBooker(userMapper.toUser(dto.getBooker()));
+        booking.setItem(itemMapper.toItem(dto.getItem(), dto.getItem().getOwnerId()));
     }
 
-    public Booking toModel(BookingCreateDto dto, UserDto user, ItemDto item) {
 
-        return Booking.builder()
-                .id(dto.getId())
-                .booker(userMapper.toUser(user))
-                .start(dto.getStart())
-                .end(dto.getEnd())
-                .status(dto.getStatus())
-                .item(itemMapper.toItem(item, item.getOwnerId()))
-                .build();
+    @Mapping(target = "booker", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    @Mapping(target = "id", source = "dto.id")
+    Booking toModel(BookingCreateDto dto, UserDto user, ItemDto item,
+                    @Context UserMapper userMapper,
+                    @Context ItemMapper itemMapper);
+
+    @AfterMapping
+    default void afterMappingBooking(BookingCreateDto dto,
+                                     UserDto user, ItemDto item,
+                                     @MappingTarget Booking booking,
+                                     @Context UserMapper userMapper,
+                                     @Context ItemMapper itemMapper) {
+        booking.setBooker(userMapper.toUser(user));
+        booking.setItem(itemMapper.toItem(item, item.getOwnerId()));
     }
 
-    public BookingDto toDto(Booking entity) {
+    @Mapping(target = "booker", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    BookingDto toDto(Booking entity, @Context UserMapper userMapper,
+                     @Context ItemMapper itemMapper);
 
-        return BookingDto.builder()
-                .id(entity.getId())
-                .booker(userMapper.toUserDto(entity.getBooker()))
-                .start(entity.getStart())
-                .end(entity.getEnd())
-                .status(entity.getStatus())
-                .item(itemMapper.toItemDto(entity.getItem()))
-                .build();
+    @AfterMapping
+    default void afterMappingBookingDto(Booking entity,
+                                        @MappingTarget BookingDto bookingDto,
+                                        @Context UserMapper userMapper,
+                                        @Context ItemMapper itemMapper) {
+        bookingDto.setBooker(userMapper.toUserDto(entity.getBooker()));
+        bookingDto.setItem(itemMapper.toItemDto(entity.getItem()));
     }
 }

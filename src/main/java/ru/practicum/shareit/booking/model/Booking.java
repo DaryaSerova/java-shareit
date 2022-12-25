@@ -29,7 +29,6 @@ public class Booking {
     @Column(name = "end_date")
     private LocalDateTime end;
 
-
     @OneToOne
     private Item item;
 
