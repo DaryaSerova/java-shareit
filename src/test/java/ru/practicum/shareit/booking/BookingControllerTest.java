@@ -136,7 +136,7 @@ public class BookingControllerTest {
 
         var booking = bookingService.addBooking(user2.getId(), generateBookingCreateDto(itemId.getId()));
 
-        String result = mvc.perform(get("/bookings/" + user.getId())
+        String result = mvc.perform(get("/bookings/" + booking.getId())
                         .header(OWNER_ID, user.getId())
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
