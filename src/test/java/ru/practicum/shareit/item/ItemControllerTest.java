@@ -90,6 +90,7 @@ public class ItemControllerTest {
         assertNotNull(savedItem);
         assertNotNull(savedItem.getId());
     }
+
     @Test
     public void shouldThrowItemEmptyAvailableExceptionWhenAddItemByEmptyAvailableStatus() throws Exception {
 
@@ -202,7 +203,7 @@ public class ItemControllerTest {
         var item = itemService.addItem(user.getId(), generateItemDto(user.getId()));
 
         item.setName("test value changed");
-         mvc.perform(patch("/items/" + 100L)
+        mvc.perform(patch("/items/" + 100L)
                         .content(mapper.writeValueAsString(item))
                         .header(OWNER_ID, user.getId())
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -233,6 +234,7 @@ public class ItemControllerTest {
         assertNotNull(savedItem.getId());
         assertEquals(savedItem.getId(), item.getId());
     }
+
     @Test
     public void shouldThrowItemNotFoundExceptionWhenGetItemById() throws Exception {
 

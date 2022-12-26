@@ -52,6 +52,7 @@ public class Fixture {
                 .status(BookingStatus.WAITING)
                 .build();
     }
+
     public static BookingDto generateBookingDto(Long itemId) {
         return BookingDto.builder()
                 .id(1L)
@@ -100,11 +101,11 @@ public class Fixture {
                 .name("test")
                 .requestId(1L)
                 .comments(List.of(Comment.builder()
-                                .text("test")
-                                .authorId(1L)
-                                .created(LocalDateTime.now())
-                                .id(1L)
-                                .itemId(1L)
+                        .text("test")
+                        .authorId(1L)
+                        .created(LocalDateTime.now())
+                        .id(1L)
+                        .itemId(1L)
                         .build()))
                 .build();
     }

@@ -70,7 +70,8 @@ public class RequestServiceImpl implements RequestService {
         return requests.stream()
                 .map(requestMapper::toRequestRequestorDto)
                 .peek(el -> {
-                    el.setItems(itemService.getItemsByRequestId(el.getId()));})
+                    el.setItems(itemService.getItemsByRequestId(el.getId()));
+                })
                 .collect(Collectors.toList());
 
     }
