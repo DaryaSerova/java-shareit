@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.booking.exceptions.*;
 import ru.practicum.shareit.item.comment.exception.CommentBadRequestException;
 import ru.practicum.shareit.item.exceptions.*;
+import ru.practicum.shareit.request.exceptions.RequestEmptyNameException;
 import ru.practicum.shareit.request.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.user.exceptions.*;
 
@@ -24,10 +25,11 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({UserDuplicateEmailException.class, UserEmptyEmailException.class,
-    UserInvalidEmailException.class, ItemEmptyAvailableException.class, ItemEmptyDescriptionException.class,
-    ItemEmptyNameException.class, BookingStateBadRequestException.class, BookingStatusBadRequestException.class,
-    BookingDateBadRequestException.class, ItemUnavailableException.class, CommentBadRequestException.class})
+    @ExceptionHandler({UserEmptyEmailException.class,
+    UserInvalidEmailException.class, ItemEmptyAvailableException.class,
+    ItemEmptyNameException.class, RequestEmptyNameException.class, BookingStateBadRequestException.class,
+    BookingStatusBadRequestException.class, BookingDateBadRequestException.class,
+    ItemUnavailableException.class, CommentBadRequestException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestFoundException(final RuntimeException e) {
         log.info(e.getMessage(), e);

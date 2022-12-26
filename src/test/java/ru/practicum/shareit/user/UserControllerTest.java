@@ -11,6 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.exceptions.UserDuplicateEmailException;
+import ru.practicum.shareit.user.exceptions.UserEmptyEmailException;
+import ru.practicum.shareit.user.exceptions.UserInvalidEmailException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
@@ -71,6 +74,57 @@ public class UserControllerTest {
     }
 
     @Test
+    public void shouldThrowUserInvalidEmailExceptionWhenCreateUserByInvalidEmail() throws Exception {
+
+        var user = generateUser();
+        user.setEmail("wrong");
+        mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof UserInvalidEmailException));
+
+    }
+
+    @Test
+    public void shouldThrowUserInvalidEmailExceptionWhenCreateUserByEmptyEmail() throws Exception {
+
+        var user = generateUser();
+        user.setEmail(null);
+        mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof UserEmptyEmailException));
+
+    }
+
+    @Test
+    public void shouldThrowUserDuplicateEmailExceptionWhenUpdateUser() throws Exception {
+        var user = generateUserDto();
+        user = userService.createUser(user);
+        user.setId(33L);
+        user.setEmail("test2@test.ru");
+        user = userService.createUser(user);
+        user.setEmail("john.doe@mail.com");
+        mvc.perform(patch("/users/" + user.getId())
+                        .content(mapper.writeValueAsString(user))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof UserDuplicateEmailException));
+
+    }
+
+    @Test
     public void shouldUpdateUser() throws Exception {
 
         var user = generateUserDto();
@@ -92,6 +146,23 @@ public class UserControllerTest {
         assertEquals(user.getEmail(), savedUser.getEmail());
 
     }
+
+    @Test
+    public void shouldThrowUserNotFoundExceptionWhenUpdateUser() throws Exception {
+
+        var user = generateUserDto();
+        user = userService.createUser(user);
+
+        mvc.perform(patch("/users/" + 99L)
+                        .content(mapper.writeValueAsString(user))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof UserNotFoundException));
+    }
+
 
     @Test
     public void shouldGetUser() throws Exception {

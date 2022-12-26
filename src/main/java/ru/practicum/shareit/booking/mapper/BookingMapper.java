@@ -19,15 +19,6 @@ public interface BookingMapper {
     @Mapping(target = "item", ignore = true)
     Booking toModel(BookingDto dto);
 
-    @AfterMapping
-    default void afterMappingBooking(BookingDto dto,
-                                     @MappingTarget Booking booking,
-                                     @Context UserMapper userMapper,
-                                     @Context ItemMapper itemMapper) {
-        booking.setBooker(userMapper.toUser(dto.getBooker()));
-        booking.setItem(itemMapper.toItem(dto.getItem(), dto.getItem().getOwnerId()));
-    }
-
 
     @Mapping(target = "booker", ignore = true)
     @Mapping(target = "item", ignore = true)
@@ -48,7 +39,8 @@ public interface BookingMapper {
 
     @Mapping(target = "booker", ignore = true)
     @Mapping(target = "item", ignore = true)
-    BookingDto toDto(Booking entity, @Context UserMapper userMapper,
+    BookingDto toDto(Booking entity,
+                     @Context UserMapper userMapper,
                      @Context ItemMapper itemMapper);
 
     @AfterMapping

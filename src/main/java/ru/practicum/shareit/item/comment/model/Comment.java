@@ -33,6 +33,5 @@ public class Comment {
 
     @PrePersist
     public void prePersist() {
-        created = LocalDateTime.now();
-    }
+        created = LocalDateTime.now();}
 }

@@ -27,6 +27,5 @@ public interface UserMapper {
         if (userDto.getName() != null && !userDto.getName().isEmpty()) {
             user.setName(userDto.getName());
         }
-
     }
 }

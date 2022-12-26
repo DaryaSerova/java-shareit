@@ -3,10 +3,10 @@ package ru.practicum.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.exceptions.ItemEmptyNameException;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.dto.RequestRequestorDto;
+import ru.practicum.shareit.request.exceptions.RequestEmptyNameException;
 import ru.practicum.shareit.request.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.request.jpa.RequestPersistService;
 import ru.practicum.shareit.request.mapper.RequestMapper;
@@ -34,7 +34,7 @@ public class RequestServiceImpl implements RequestService {
         userService.getUser(requestorId);
 
         if (requestDto.getDescription() == null || requestDto.getDescription().isEmpty()) {
-            throw new ItemEmptyNameException("Описание запроса не может быть пустым.");
+            throw new RequestEmptyNameException("Описание запроса не может быть пустым.");
         }
 
         return requestMapper.toRequestDto(
@@ -59,6 +59,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestRequestorDto> getAllRequestByRequestorId(Long requestorId) {
+
         userService.getUser(requestorId);
 
         var requests = requestPersistService.findAllByRequestorId(requestorId);
@@ -69,8 +70,7 @@ public class RequestServiceImpl implements RequestService {
         return requests.stream()
                 .map(requestMapper::toRequestRequestorDto)
                 .peek(el -> {
-                    el.setItems(itemService.getItemsByRequestId(el.getId()));
-                })
+                    el.setItems(itemService.getItemsByRequestId(el.getId()));})
                 .collect(Collectors.toList());
 
     }
@@ -81,7 +81,6 @@ public class RequestServiceImpl implements RequestService {
         var requests = requestPersistService.findAllByRequestorIdNot(requestorId, pageable);
 
         return requests.stream()
-
                 .map(requestMapper::toRequestRequestorDto)
                 .peek(el -> {
                     el.setItems(itemService.getItemsByRequestId(el.getId()));

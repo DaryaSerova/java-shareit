@@ -37,13 +37,4 @@ public class Item {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id")
     private List<Comment> comments;
-
-    public Item(Long id, String name, String description, Long ownerId, Boolean available) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.ownerId = ownerId;
-        this.available = available;
-    }
-
 }

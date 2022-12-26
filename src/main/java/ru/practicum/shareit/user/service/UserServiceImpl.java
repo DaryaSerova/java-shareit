@@ -2,13 +2,13 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.exceptions.UserDuplicateEmailException;
 import ru.practicum.shareit.user.exceptions.UserEmptyEmailException;
 import ru.practicum.shareit.user.exceptions.UserInvalidEmailException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +52,8 @@ public class UserServiceImpl implements UserService {
         }
         Optional<User> duplicateUser = userPersistService.findUserByEmail(userDto.getEmail());
         if (duplicateUser.isPresent() && !duplicateUser.get().getId().equals(userDto.getId())) {
-            throw new UserDuplicateEmailException(String.format("Пользователь с email %s уже существует."));
+            throw new UserDuplicateEmailException(String.format("Пользователь с email %s уже существует.",
+                      userDto.getEmail()));
         }
 
         userDto.setId(id);

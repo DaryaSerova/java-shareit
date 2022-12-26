@@ -104,6 +104,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemToRequestDto> getItemsByRequestId(Long requestId) {
+
         var items = itemPersistService.findItemsByRequestId(requestId);
         if (items == null || items.isEmpty()) {
             return emptyList();
@@ -118,11 +119,6 @@ public class ItemServiceImpl implements ItemService {
     public Page<ItemOwnerDto> getAllItemsByOwnerId(Long ownerId, Integer from, Integer size) {
 
         Page<Item> items = itemPersistService.findAllItemsByOwnerId(ownerId, from, size);
-
-        if (items.isEmpty()) {
-            throw new ItemNotFoundException("Предмет не найден.");
-        }
-
         return items
                 .map(el -> itemMapper.toItemOwnerDto(el,
                         bookingPersistService.findBookingByItemId(el.getId())));
@@ -136,22 +132,22 @@ public class ItemServiceImpl implements ItemService {
         }
         var items = itemPersistService.findAvailableItemsByName(name, from, size);
 
-        if (items.isEmpty()) {
-            throw new ItemNotFoundException("Предмет не найден.");
-        }
-
         return items
                 .map(el -> itemMapper.toItemOwnerDto(el, bookingPersistService.findBookingByItemId(el.getId())));
     }
 
     @Override
     public CommentDto addItemComment(Long ownerId, Long itemId, CommentDto commentDto) {
+
         if (itemId == null || commentDto.getText() == null || commentDto.getText().isEmpty()) {
             throw new CommentBadRequestException("Не валидные параметры комментария ");
         }
         getItemById(ownerId, itemId);
+
         commentDto.setItemId(itemId);
+
         commentDto.setAuthorId(ownerId);
+
         var bookings = bookingPersistService.findBookingByItemIdAndStatusNotInAndStartBefore(itemId,
                 List.of(BookingStatus.REJECTED), LocalDateTime.now());
         if (bookings == null || bookings.isEmpty()) {
@@ -159,8 +155,11 @@ public class ItemServiceImpl implements ItemService {
         }
 
         var result = commentMapper.toDto(commentRepository.save(commentMapper.toModel(commentDto)));
+
         var author = userPersistService.findUserById(ownerId).get();
+
         result.setAuthorName(author.getName());
+
         return result;
 
     }

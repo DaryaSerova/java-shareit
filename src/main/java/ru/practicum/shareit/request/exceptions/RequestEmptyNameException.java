@@ -1,12 +1,12 @@
-package ru.practicum.shareit.item.exceptions;
+package ru.practicum.shareit.request.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-public class ItemEmptyDescriptionException extends RuntimeException {
+public class RequestEmptyNameException extends RuntimeException {
 
-    public ItemEmptyDescriptionException(final String message) {
+    public RequestEmptyNameException(final String message) {
         super(message);
     }
 

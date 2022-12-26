@@ -12,8 +12,6 @@ import ru.practicum.shareit.item.service.ItemService;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-import static ru.practicum.shareit.auth.AuthConstant.OWNER_ID;
-
 @Slf4j
 @RequiredArgsConstructor
 @Validated
@@ -21,7 +19,7 @@ import static ru.practicum.shareit.auth.AuthConstant.OWNER_ID;
 @RequestMapping("/items")
 public class ItemController {
 
-
+    public static final String OWNER_ID = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @PostMapping

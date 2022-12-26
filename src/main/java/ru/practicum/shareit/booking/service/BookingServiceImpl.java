@@ -36,6 +36,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto findBookingById(Long ownerId, Long bookingId) {
+
         var booking = getBooking(bookingId);
         userService.getUser(ownerId);
 
@@ -53,6 +54,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto addBooking(Long ownerId, BookingCreateDto bookingDto) {
+
         var item = itemService.getItemById(ownerId, bookingDto.getItemId());
 
         if (item.getAvailable() == null || item.getAvailable() == false) {
@@ -78,6 +80,7 @@ public class BookingServiceImpl implements BookingService {
 
         bookingDto.setBookerId(ownerId);
         bookingDto.setStatus(BookingStatus.WAITING);
+
         return mapper.toDto(bookingPersistService.createBooking(
                 mapper.toModel(bookingDto, user, item, userMapper, itemMapper)), userMapper, itemMapper);
     }
@@ -100,13 +103,16 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Page<BookingDto> getBookingForUserByState(Long ownerId, BookingState state, Integer from, Integer size) {
+
         userService.getUser(ownerId);
+
         return bookingPersistService.findBookingForUserByState(ownerId, state, from, size)
                 .map(el -> mapper.toDto(el, userMapper, itemMapper));
     }
 
     @Override
     public Page<BookingDto> getBookingForUserByItems(Long ownerId, BookingState state, Integer from, Integer size) {
+
         userService.getUser(ownerId);
 
         var items = itemService.getAllItemsByOwnerId(ownerId, 0, 100).getContent();

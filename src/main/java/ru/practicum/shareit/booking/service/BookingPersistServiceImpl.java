@@ -42,13 +42,15 @@ public class BookingPersistServiceImpl implements BookingPersistService {
 
     @Override
     public List<Booking> findBookingByItemIdAndStatusNotInAndStartBefore(
-            Long itemId, List<BookingStatus> statuses, LocalDateTime start) {
+                         Long itemId, List<BookingStatus> statuses, LocalDateTime start) {
         return bookingRepository.findBookingByItemIdAndStatusNotInAndStartBefore(itemId, statuses, start);
     }
 
     @Override
     public Page<Booking> findBookingForUserByState(Long ownerId, BookingState state, Integer from, Integer size) {
+
         var page = PageRequest.of(from / size, size, Sort.by("start").descending());
+
         switch (state) {
             case CURRENT:
                 return bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(
@@ -70,7 +72,9 @@ public class BookingPersistServiceImpl implements BookingPersistService {
     @Override
     public Page<Booking> findBookingForUserByItems(Long ownerId, List<Long> itemIds, BookingState state,
                                                    Integer from, Integer size) {
+
         var page = PageRequest.of(from, size, Sort.by("start").descending());
+
         switch (state) {
             case CURRENT:
                 return bookingRepository.findByStartBeforeAndEndAfterAndItemIdIn(

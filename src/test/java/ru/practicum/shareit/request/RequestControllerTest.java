@@ -10,8 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.dto.RequestRequestorDto;
+import ru.practicum.shareit.request.exceptions.RequestEmptyNameException;
+import ru.practicum.shareit.request.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.request.service.RequestService;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -23,9 +26,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static ru.practicum.shareit.Fixture.generateRequestDto;
-import static ru.practicum.shareit.Fixture.generateUserDto;
-import static ru.practicum.shareit.auth.AuthConstant.REQUESTOR_ID;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.Fixture.*;
+import static ru.practicum.shareit.request.RequestController.REQUESTOR_ID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -50,6 +53,9 @@ public class RequestControllerTest {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private ItemService itemService;
 
     @BeforeEach
     public void clearContext() {
@@ -81,6 +87,26 @@ public class RequestControllerTest {
     }
 
     @Test
+    public void shouldThrowRequestEmptyNameExceptionWhenAddRequest() throws Exception {
+
+        var user = generateUserDto();
+        user = userService.createUser(user);
+
+        var request = generateRequestDto(user.getId());
+        request.setDescription(null);
+        mvc.perform(post("/requests")
+                        .content(mapper.writeValueAsString(request))
+                        .header(REQUESTOR_ID, user.getId())
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof RequestEmptyNameException));
+
+    }
+
+    @Test
     public void shouldGetRequestById() throws Exception {
 
         var user = generateUserDto();
@@ -88,6 +114,10 @@ public class RequestControllerTest {
 
         var request = generateRequestDto(user.getId());
         request = requestService.addRequest(user.getId(), request);
+        var item = generateItemDto(user.getId());
+        item.setRequestId(request.getId());
+        item = itemService.addItem(user.getId(), generateItemDto(user.getId()));
+
 
         String result = mvc.perform(get("/requests/" + request.getId())
                         .header(REQUESTOR_ID, user.getId())
@@ -100,6 +130,23 @@ public class RequestControllerTest {
         RequestDto savedRequest = mapper.readValue(result, RequestDto.class);
         assertNotNull(savedRequest);
         assertNotNull(savedRequest.getId());
+    }
+
+    @Test
+    public void shouldThrowRequestNotFoundExceptionWhenGetRequestById() throws Exception {
+
+        var user = generateUserDto();
+        user = userService.createUser(user);
+
+
+        mvc.perform(get("/requests/" + 99L)
+                        .header(REQUESTOR_ID, user.getId())
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof RequestNotFoundException));
     }
 
     @Test

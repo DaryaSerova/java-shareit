@@ -77,6 +77,7 @@ public interface ItemMapper {
 
     @AfterMapping
     default void afterMergeToItem(ItemDto itemDto, @MappingTarget Item item) {
+
         if (itemDto.getName() != null && !itemDto.getName().isEmpty()) {
             item.setName(itemDto.getName());
         }

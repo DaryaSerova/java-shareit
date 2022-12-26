@@ -20,11 +20,10 @@ public interface BookingPersistService {
     List<Booking> findBookingByItemId(Long itemId);
 
     List<Booking> findBookingByItemIdAndStatusNotInAndStartBefore(
-            Long itemId, List<BookingStatus> statuses, LocalDateTime start);
+                  Long itemId, List<BookingStatus> statuses, LocalDateTime start);
 
-    Page<Booking> findBookingForUserByState(Long ownerId, BookingState state, Integer from,
-                                            Integer size);
+    Page<Booking> findBookingForUserByState(Long ownerId, BookingState state, Integer from, Integer size);
 
     Page<Booking> findBookingForUserByItems(Long ownerId, List<Long> itemIds, BookingState state,
-             Integer from, Integer size);
+                                            Integer from, Integer size);
 }

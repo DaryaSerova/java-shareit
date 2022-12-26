@@ -17,31 +17,30 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingByItemId(Long bookerId);
 
     List<Booking> findBookingByItemIdAndStatusNotInAndStartBefore(
-            Long bookerId, List<BookingStatus> statuses, LocalDateTime start);
+                  Long bookerId, List<BookingStatus> statuses, LocalDateTime start);
 
     Page<Booking> findByBookerId(Long bookerId, Pageable pageable);
 
     Page<Booking> findByBookerIdAndStartBeforeAndEndAfter(
-            Long bookerId, LocalDateTime start, LocalDateTime end, Pageable pageable);
+                  Long bookerId, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
     Page<Booking> findByBookerIdAndStatus(Long bookerId, BookingStatus status, Pageable pageable);
 
     Page<Booking> findByBookerIdAndStartAfter(Long bookerId, LocalDateTime start, Pageable pageable);
 
     Page<Booking> findByBookerIdAndStartBeforeAndEndBefore(
-            Long bookerId, LocalDateTime start, LocalDateTime end, Pageable pageable);
-
+                  Long bookerId, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
     Page<Booking> findByItemIdIn(List<Long> itemIds, Pageable pageable);
 
     Page<Booking> findByStartBeforeAndEndAfterAndItemIdIn(
-            LocalDateTime start, LocalDateTime end, List<Long> itemIds, Pageable pageable);
+                  LocalDateTime start, LocalDateTime end, List<Long> itemIds, Pageable pageable);
 
     Page<Booking> findByStatusAndItemIdIn(BookingStatus status, List<Long> itemIds, Pageable pageable);
 
     Page<Booking> findByStartBeforeAndEndBeforeAndItemIdIn(
-            LocalDateTime start, LocalDateTime end, List<Long> itemIds, Pageable pageable);
+                  LocalDateTime start, LocalDateTime end, List<Long> itemIds, Pageable pageable);
 
     Page<Booking> findByStartAfterAndItemIdIn(
-            LocalDateTime start, List<Long> itemIds, Pageable pageable);
+                   LocalDateTime start, List<Long> itemIds, Pageable pageable);
 }

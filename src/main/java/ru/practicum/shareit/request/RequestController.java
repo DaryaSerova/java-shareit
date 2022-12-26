@@ -13,15 +13,13 @@ import ru.practicum.shareit.request.service.RequestService;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-import static ru.practicum.shareit.auth.AuthConstant.REQUESTOR_ID;
-
 @Slf4j
 @RequiredArgsConstructor
 @Validated
 @RestController
 @RequestMapping(path = "/requests")
 public class RequestController {
-
+    public static final String REQUESTOR_ID = "X-Sharer-User-Id";
     private final RequestService requestService;
 
     @PostMapping

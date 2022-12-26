@@ -12,7 +12,6 @@ import ru.practicum.shareit.booking.service.BookingService;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-import static ru.practicum.shareit.auth.AuthConstant.OWNER_ID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,7 +19,7 @@ import static ru.practicum.shareit.auth.AuthConstant.OWNER_ID;
 @RestController
 @RequestMapping(path = "/bookings")
 public class BookingController {
-
+    public static final String OWNER_ID = "X-Sharer-User-Id";
     private final BookingService bookingService;
 
     @PostMapping
