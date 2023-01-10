@@ -24,7 +24,7 @@ services:
     depends_on:
       - db
     environment:
-      - "TZ=Europe/Moscow"
+#      - "TZ=Europe/Moscow"
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
       - spring_datasource_username=postgres
       - spring_datasource_password=shareit
@@ -39,5 +39,5 @@ services:
     depends_on:
       - shareit-server
     environment:
-      - "TZ=Europe/Moscow"
+#      - "TZ=Europe/Moscow"
       - SHAREIT_SERVER_URL=http://shareit-server:9090
